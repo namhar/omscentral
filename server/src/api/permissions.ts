@@ -47,7 +47,7 @@ export const permissions = shield(
     fallbackRule: allow,
     fallbackError: (error: any): any => {
       error && logger.error('permissions:', error);
-      if (appConfig.environment === 'local') {
+      if (appConfig.environment !== 'production') {
         throw forbidden(error);
       } else {
         throw forbidden();
