@@ -13,7 +13,6 @@ import useQueryParams from 'src/core/hooks/useQueryParams';
 import { AuthContext } from '../Auth';
 import { FirebaseContext } from '../Firebase';
 import Grow from '../Grow';
-import Link from '../Link';
 import NavbarButton from './components/NavbarButton';
 import SearchInput from './components/SearchInput';
 import UserMenu from './components/UserMenu';
@@ -22,6 +21,7 @@ import { useStyles } from './Navbar.styles';
 const Navbar: React.FC = () => {
   const classes = useStyles();
   const xs = useMediaQuery<Theme>((theme) => theme.breakpoints.down('xs'));
+  const sm = useMediaQuery<Theme>((theme) => theme.breakpoints.down('sm'));
   const firebase = useContext(FirebaseContext);
   const auth = useContext(AuthContext);
   const history = useHistory();
@@ -48,8 +48,8 @@ const Navbar: React.FC = () => {
           </Typography>
           <NavbarButton path={paths.courses}>Courses</NavbarButton>
           {!xs && <NavbarButton path={paths.reviews()}>Reviews</NavbarButton>}
-          {!xs && <NavbarButton path={paths.trends}>Trends</NavbarButton>}
-          {!xs && (
+          <NavbarButton path={paths.trends}>Trends</NavbarButton>
+          {!sm && (
             <SearchInput
               value={query}
               onChange={setQuery}
@@ -57,12 +57,12 @@ const Navbar: React.FC = () => {
             />
           )}
           <Grow />
-          <Link to={urls.coffee} className={classes.coffee}>
-            ☕️
-          </Link>
-          <Link to={urls.bugs} className={classes.bugs}>
-            🐛
-          </Link>
+          {!xs && (
+            <NavbarButton onClick={() => window.open(urls.support)}>
+              Support
+            </NavbarButton>
+          )}
+          <NavbarButton path={paths.pricing()}>Pricing</NavbarButton>
           {auth.initializing ? null : auth.authenticated ? (
             <UserMenu />
           ) : (

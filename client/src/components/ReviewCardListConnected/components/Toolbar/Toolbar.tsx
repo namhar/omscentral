@@ -4,15 +4,18 @@ import Grow from 'src/components/Grow';
 import Menu from 'src/components/Menu';
 import { Option, ReviewSortKey as SortKey } from 'src/core';
 import useBoolean from 'src/core/hooks/useBoolean';
+import { WordsQuery } from 'src/graphql';
 
 import AutocompleteFilter from '../AutocompleteFilter';
 import DifficultyFilter from '../DifficultyFilter';
 import FilterPopover from '../FilterPopover';
 import SemesterFilter from '../SemesterFilter';
 import ToolbarButton from '../ToolbarButton';
+import WordCloud from '../WordCloud';
 import { useStyles } from './Toolbar.styles';
 
 export interface Props {
+  words?: WordsQuery['words'];
   courseFilter?: string[];
   courseFilterOptions: Option[];
   onCourseFilterChange: (filter: string[]) => void;
@@ -22,12 +25,16 @@ export interface Props {
   difficultyFilter?: number[];
   difficultyFilterOptions: Option<number>[];
   onDifficultyFilterChange: (filter: number[]) => void;
+  ratingFilter?: number[];
+  ratingFilterOptions: Option<number>[];
+  onRatingFilterChange: (filter: number[]) => void;
   sortKey?: SortKey;
   sortKeyOptions: Option<SortKey>[];
   onSortKeyChange: (key: SortKey) => void;
 }
 
 const Toolbar: React.FC<Props> = ({
+  words,
   courseFilter,
   courseFilterOptions,
   onCourseFilterChange,
@@ -37,6 +44,9 @@ const Toolbar: React.FC<Props> = ({
   difficultyFilter,
   difficultyFilterOptions,
   onDifficultyFilterChange,
+  ratingFilter,
+  ratingFilterOptions,
+  onRatingFilterChange,
   sortKey,
   sortKeyOptions,
   onSortKeyChange,
@@ -61,6 +71,12 @@ const Toolbar: React.FC<Props> = ({
     setFalse: hideDifficultyFilter,
   } = useBoolean(false);
 
+  const {
+    value: isRatingFilterOpen,
+    setTrue: showRatingFilter,
+    setFalse: hideRatingFilter,
+  } = useBoolean(false);
+
   const handleCourseFilterSubmit = (courseIds: string[]) => {
     onCourseFilterChange(courseIds);
     hideCourseFilter();
@@ -76,10 +92,17 @@ const Toolbar: React.FC<Props> = ({
     hideDifficultyFilter();
   };
 
+  const handleRatingFilterSubmit = (ratings: number[]) => {
+    onRatingFilterChange(ratings);
+    hideRatingFilter();
+  };
+
   const sortKeyOption = sortKeyOptions.find(({ value }) => value === sortKey)!;
 
   return (
     <div className={classes.toolbar}>
+      <WordCloud words={words} />
+
       <Grow />
 
       {courseFilterOptions.length > 0 && courseFilter != null && (
@@ -91,6 +114,8 @@ const Toolbar: React.FC<Props> = ({
           open={isCourseFilterOpen}
           onOpen={showCourseFilter}
           onClose={hideCourseFilter}
+          anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+          transformOrigin={{ horizontal: 'left', vertical: 'top' }}
         >
           <AutocompleteFilter
             label="Courses"
@@ -137,12 +162,30 @@ const Toolbar: React.FC<Props> = ({
         </FilterPopover>
       )}
 
+      {ratingFilterOptions.length > 0 && ratingFilter != null && (
+        <FilterPopover
+          id="filter_by_ratings"
+          name="Ratings"
+          total={ratingFilterOptions.length}
+          selected={ratingFilter.length}
+          open={isRatingFilterOpen}
+          onOpen={showRatingFilter}
+          onClose={hideRatingFilter}
+        >
+          <DifficultyFilter
+            options={ratingFilterOptions}
+            initialValues={ratingFilter}
+            onSubmit={handleRatingFilterSubmit}
+          />
+        </FilterPopover>
+      )}
+
       <Menu
         id="sort_by"
         renderTrigger={({ open, onOpen }) => (
           <ToolbarButton
             id="sort_by_trigger"
-            caption={`Sort by: ${sortKeyOption.label}`}
+            caption={`Sort: ${sortKeyOption.label}`}
             open={open}
             onClick={onOpen}
           />

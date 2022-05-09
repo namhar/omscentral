@@ -24,6 +24,10 @@ const CoursesContainer: React.FC = () => {
     '/c:ds',
     false,
   );
+  const [isNonFoundationalShown, setIsNonFoundationalShown] = useLocal<boolean>(
+    '/c:nf',
+    true,
+  );
 
   const courses = useCoursesQuery({ fetchPolicy: 'no-cache' });
   const semesters = useSemestersQuery();
@@ -36,6 +40,7 @@ const CoursesContainer: React.FC = () => {
     setSpecializationId(id);
     setIsUnreviewedShown(!!id);
     setIsDeprecatedShown(!!id);
+    setIsNonFoundationalShown(!!id);
   };
 
   const specialization = specializations.data?.specializations?.find(
@@ -47,11 +52,18 @@ const CoursesContainer: React.FC = () => {
       return courses.data?.courses;
     }
     return courses.data?.courses.filter((course) => {
-      const unreviewedCheck = isUnreviewedShown || course.metric?.reviews.count;
+      const unreviewedCheck =
+        isUnreviewedShown || course.metric?.reviews.count != null;
       const deprecatedCheck = isDeprecatedShown || !course.deprecated;
-      return Boolean(unreviewedCheck && deprecatedCheck);
+      const foundationalCheck = isNonFoundationalShown || course.foundational;
+      return Boolean(unreviewedCheck && deprecatedCheck && foundationalCheck);
     });
-  }, [courses.data?.courses, isDeprecatedShown, isUnreviewedShown]);
+  }, [
+    courses.data?.courses,
+    isDeprecatedShown,
+    isUnreviewedShown,
+    isNonFoundationalShown,
+  ]);
 
   return (
     <>
@@ -72,6 +84,8 @@ const CoursesContainer: React.FC = () => {
         onIsUnreviewedShownChange={setIsUnreviewedShown}
         isDeprecatedShown={isDeprecatedShown}
         onIsDeprecatedShownChange={setIsDeprecatedShown}
+        isNonFoundationalShown={isNonFoundationalShown}
+        onIsNonFoundationalShownChange={setIsNonFoundationalShown}
       />
     </>
   );

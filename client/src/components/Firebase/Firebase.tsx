@@ -14,12 +14,12 @@ import {
   TwitterAuthProvider,
 } from 'firebase/auth';
 import { FirebasePerformance, getPerformance } from 'firebase/performance';
-import React, { createContext } from 'react';
+import React, { createContext, useContext } from 'react';
 import { firebaseConfig } from 'src/config';
 
 const app = initializeApp(firebaseConfig);
 
-interface Firebase {
+interface ContextValue {
   analytics: Analytics;
   auth: Auth;
   authProviders: {
@@ -31,7 +31,7 @@ interface Firebase {
   performance: FirebasePerformance;
 }
 
-const value: Firebase = {
+const value: ContextValue = {
   analytics: getAnalytics(app),
   auth: getAuth(),
   authProviders: {
@@ -66,7 +66,10 @@ if (process.env.NODE_ENV !== 'production') {
   setAnalyticsCollectionEnabled(value.analytics, false);
 }
 
-export const FirebaseContext = createContext<Firebase>(value);
+export const FirebaseContext = createContext<ContextValue>(value);
+
+export const useFirebase: () => ContextValue = () =>
+  useContext(FirebaseContext);
 
 const Firebase: React.FC = ({ children }) => (
   <FirebaseContext.Provider value={value}>{children}</FirebaseContext.Provider>

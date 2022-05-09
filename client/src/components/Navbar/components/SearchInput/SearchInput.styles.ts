@@ -26,7 +26,7 @@ export const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
   },
   inputRoot: {
-    color: 'inherit',
+    color: '#ffffff !important',
   },
   inputInput: {
     padding: theme.spacing(1, 1, 1, 0),

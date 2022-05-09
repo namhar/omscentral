@@ -5,5 +5,6 @@ export { phase as postgres } from './postgres';
 export { phase as processEvents } from './processEvents';
 export { phase as upsertCourseMetrics } from './upsertCourseMetrics';
 export { phase as upsertCourses } from './upsertCourses';
+export { phase as upsertFeatures } from './upsertFeatures';
 export { phase as upsertSemesters } from './upsertSemesters';
 export { phase as upsertSpecializations } from './upsertSpecializations';

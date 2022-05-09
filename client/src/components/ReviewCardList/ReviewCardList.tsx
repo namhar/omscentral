@@ -32,7 +32,7 @@ const ReviewCardList: React.FC<Props> = ({
   highlight,
   whenEmpty = (
     <Typography>
-      No reviews. <Link to="">Go back</Link>.
+      There are no reviews to display. <Link to="">Go back</Link>.
     </Typography>
   ),
   before,

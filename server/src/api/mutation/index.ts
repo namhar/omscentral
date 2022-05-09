@@ -1,4 +1,6 @@
 import { MutationResolvers } from '../../graphql';
+import { resolver as createCheckoutSession } from './createCheckoutSession';
+import { resolver as createCustomerPortalSession } from './createCustomerPortalSession';
 import { resolver as deleteReview } from './deleteReview';
 import { resolver as insertReview } from './insertReview';
 import { resolver as reportReview } from './reportReview';
@@ -13,4 +15,6 @@ export const Mutation: MutationResolvers = {
   updateReview,
   updateUser,
   upsertUser,
+  createCheckoutSession,
+  createCustomerPortalSession,
 };

@@ -8,10 +8,7 @@ const UserReviewsContainer: React.FC = () => {
       <Helmet title="My Reviews">
         <meta name="description" content="User's published reviews." />
       </Helmet>
-      <ReviewCardListConnected
-        variables={{ is_mine: true }}
-        pagination={false}
-      />
+      <ReviewCardListConnected variables={{ is_mine: true }} toolbar={false} />
     </>
   );
 };

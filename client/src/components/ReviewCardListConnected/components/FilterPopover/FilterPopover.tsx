@@ -1,4 +1,4 @@
-import Popover from '@material-ui/core/Popover';
+import Popover, { PopoverProps } from '@material-ui/core/Popover';
 import React, { useState } from 'react';
 import { Nullable } from 'src/core';
 
@@ -12,6 +12,8 @@ interface Props {
   open: boolean;
   onOpen: () => void;
   onClose: () => void;
+  anchorOrigin?: PopoverProps['anchorOrigin'];
+  transformOrigin?: PopoverProps['transformOrigin'];
   children: React.ReactNode;
 }
 
@@ -23,6 +25,8 @@ const FilterPopover: React.FC<Props> = ({
   open,
   onOpen,
   onClose,
+  anchorOrigin = { vertical: 'bottom', horizontal: 'right' },
+  transformOrigin = { vertical: 'top', horizontal: 'right' },
   children,
 }) => {
   const [anchorEl, setAnchorEl] = useState<Nullable<Element>>(null);
@@ -54,8 +58,8 @@ const FilterPopover: React.FC<Props> = ({
         keepMounted
         anchorEl={anchorEl}
         getContentAnchorEl={null}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={anchorOrigin}
+        transformOrigin={transformOrigin}
         open={open}
         onClose={handleClose}
       >

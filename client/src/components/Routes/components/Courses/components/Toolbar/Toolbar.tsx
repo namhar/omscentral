@@ -1,10 +1,10 @@
 import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
-import TextField from '@material-ui/core/TextField';
 import React from 'react';
 import { Nullable } from 'src/core';
 import { Specialization } from 'src/graphql';
 
+import KeywordFilter from './components/KeywordFilter/KeywordFilter';
 import SpecializationSelect from './components/SpecializationSelect';
 import { useStyles } from './Toolbar.styles';
 
@@ -25,39 +25,25 @@ const Toolbar: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
 
-  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onFilterChange(event.target.value);
-  };
-
   return (
     <div className={classes.root}>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6} lg={3}>
           <SpecializationSelect
             className={classes.specializations}
-            onChange={onSpecializationChange}
             options={specializations}
             value={specialization}
+            onChange={onSpecializationChange}
           />
         </Grid>
         <Hidden mdDown>
           <Grid item xs={12} lg={6} />
         </Hidden>
         <Grid item xs={12} sm={6} lg={3}>
-          <TextField
+          <KeywordFilter
             className={classes.filter}
-            id="filter"
-            name="filter"
-            label="Filter Courses"
-            placeholder="e.g. ML4T, 6501, Network..."
-            size="small"
-            autoComplete="filter"
-            variant="filled"
             value={filter}
-            onChange={handleFilterChange}
-            InputLabelProps={{
-              shrink: true,
-            }}
+            onChange={onFilterChange}
           />
         </Grid>
       </Grid>

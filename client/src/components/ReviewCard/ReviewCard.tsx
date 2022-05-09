@@ -10,11 +10,13 @@ import Typography from '@material-ui/core/Typography';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import EditIcon from '@material-ui/icons/Edit';
 import LinkIcon from '@material-ui/icons/Link';
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import React from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import Markdown from 'react-markdown';
 import { useHistory } from 'react-router';
-import { paths, reviewMeta } from 'src/constants';
+import { Route, Router } from 'react-router-dom';
+import { browserHistory, paths, reviewMeta } from 'src/constants';
 import Season from 'src/core/components/Season';
 import { ReviewsQuery } from 'src/graphql';
 
@@ -117,12 +119,30 @@ const ReviewCard: React.FC<Props> = ({
     </>
   );
 
+  const titleUI = (
+    <Router history={browserHistory}>
+      <Route path={paths.course()}>
+        {course.link ? (
+          <Link to={course.link} className={classes.externalLink}>
+            <OpenInNewIcon fontSize="small" />
+            {title}
+          </Link>
+        ) : (
+          title
+        )}
+      </Route>
+      <Route path={[paths.reviews(), paths.userReviews]} exact>
+        <Link to={paths.course(course.id)}>{title}</Link>
+      </Route>
+    </Router>
+  );
+
   return (
     <Card className={classes.card} data-cy="review_card">
       <CardHeader
         className={classes.header}
         avatar={avatar}
-        title={course.link ? <Link to={course.link}>{title}</Link> : title}
+        title={titleUI}
         subheader={subheader}
         action={action}
       />

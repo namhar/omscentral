@@ -2,6 +2,9 @@ import TableCell, { TableCellProps } from '@material-ui/core/TableCell';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Tooltip from '@material-ui/core/Tooltip';
 import React from 'react';
+import { useHistory } from 'react-router-dom';
+import { useFeatures } from 'src/components/Features';
+import { paths } from 'src/constants';
 import { CourseColumnKey as ColumnKey, SortDirection } from 'src/core';
 
 import { useStyles } from './HeadCell.styles';
@@ -87,10 +90,15 @@ const HeadCell: React.FC<TableCellProps & Props> = ({
   ...rest
 }) => {
   const classes = useStyles();
+  const history = useHistory();
+
   const { align, width, className, label, tooltip, sortable } = config[id];
   const active = id === orderBy;
   const shouldTruncate = active && label.length > 5;
   const adjustedLabel = shouldTruncate ? label.substr(0, 5) + '...' : label;
+
+  const { isEnabled } = useFeatures();
+  const mayNotUse = !isEnabled('sorting');
 
   const content = tooltip ? (
     <Tooltip title={tooltip} placement="top">
@@ -99,6 +107,14 @@ const HeadCell: React.FC<TableCellProps & Props> = ({
   ) : (
     adjustedLabel
   );
+
+  const handleClick: TableCellProps['onClick'] = (event) => {
+    if (mayNotUse) {
+      history.push(paths.pricing(true));
+    } else {
+      onClick?.(event);
+    }
+  };
 
   return (
     <TableCell
@@ -112,7 +128,7 @@ const HeadCell: React.FC<TableCellProps & Props> = ({
         <TableSortLabel
           active={active}
           direction={order}
-          onClick={onClick}
+          onClick={handleClick}
           hideSortIcon
         >
           {content}

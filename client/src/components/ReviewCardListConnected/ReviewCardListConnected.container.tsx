@@ -7,7 +7,11 @@ import { QueryParam, ReviewSortKey as SortKey } from 'src/core';
 import useQueryParams from 'src/core/hooks/useQueryParams';
 import asArray from 'src/core/utils/asArray';
 import useSession from 'src/core/utils/useSessionStorage';
-import { ReviewsQueryVariables, useReviewsQuery } from 'src/graphql';
+import {
+  ReviewsQueryVariables,
+  useReviewsQuery,
+  useWordsQuery,
+} from 'src/graphql';
 import { useReportReviewMutation } from 'src/graphql';
 
 import { FirebaseContext } from '../Firebase';
@@ -15,33 +19,35 @@ import ReviewCardListConnected from './ReviewCardListConnected';
 
 interface Props {
   variables?: ReviewsQueryVariables;
-  pagination?: boolean;
   before?: JSX.Element;
+  toolbar?: boolean;
 }
 
 const ReviewCardListConnectedContainer: React.FC<Props> = ({
   variables,
-  pagination = true,
   before,
+  toolbar,
 }) => {
   const history = useHistory();
   const location = useLocation();
   const firebase = useContext(FirebaseContext);
 
-  const { course, semester, difficulty, sort } = useQueryParams<{
+  const { course, semester, difficulty, rating, sort } = useQueryParams<{
     [QueryParam.Course]: string[];
     [QueryParam.Semester]: string[];
-    [QueryParam.Sort]: SortKey;
     [QueryParam.Difficulty]: string[];
+    [QueryParam.Rating]: string[];
+    [QueryParam.Sort]: SortKey;
   }>();
 
   const courseFilter = asArray<string>(variables?.course_ids || course);
   const semesterFilter = asArray<string>(semester);
-  const difficultyFilter = asArray<string>(difficulty).map((_) => Number(_));
+  const difficultyFilter = asArray<string>(difficulty).map((x) => Number(x));
+  const ratingFilter = asArray<string>(rating).map((x) => Number(x));
 
   const sortKey = sort || SortKey.Created;
 
-  const [paginate, setPaginate] = useState(pagination);
+  const [paginate, setPaginate] = useState<boolean>(true);
   const [limit, setLimit] = useSession('rcl:l', paginate ? 10 : 10e6);
 
   const reviewsQ = useReviewsQuery({
@@ -52,8 +58,18 @@ const ReviewCardListConnectedContainer: React.FC<Props> = ({
       course_ids: courseFilter,
       semester_ids: semesterFilter,
       difficulties: difficultyFilter,
+      ratings: ratingFilter,
     },
     fetchPolicy: 'cache-and-network',
+  });
+
+  const course_id = courseFilter.length === 1 ? courseFilter[0] : undefined;
+
+  const wordsQ = useWordsQuery({
+    variables: {
+      course_id: course_id ?? '',
+    },
+    skip: course_id == null,
   });
 
   const handleLoadMore = async () => {
@@ -130,6 +146,11 @@ const ReviewCardListConnectedContainer: React.FC<Props> = ({
     difficultyFilter,
   );
 
+  const handleRatingFilterChange = handleFilterChange(
+    QueryParam.Rating,
+    ratingFilter,
+  );
+
   const handleSortKeyChange = (key: SortKey) => {
     if (key !== sortKey) {
       setLimit(10);
@@ -147,6 +168,7 @@ const ReviewCardListConnectedContainer: React.FC<Props> = ({
     <ReviewCardListConnected
       loading={reviewsQ.loading || reportReviewM.loading}
       reviews={reviewsQ.data?.reviews}
+      words={course_id != null ? wordsQ.data?.words : undefined}
       onReportClick={handleReportClick}
       courseFilter={variables?.course_ids == null ? courseFilter : undefined}
       onCourseFilterChange={handleCourseFilterChange}
@@ -154,6 +176,8 @@ const ReviewCardListConnectedContainer: React.FC<Props> = ({
       onSemesterFilterChange={handleSemesterFilterChange}
       difficultyFilter={difficultyFilter}
       onDifficultyFilterChange={handleDifficultyFilterChange}
+      ratingFilter={ratingFilter}
+      onRatingFilterChange={handleRatingFilterChange}
       sortKey={sortKey}
       onSortKeyChange={handleSortKeyChange}
       onLoadMore={
@@ -164,6 +188,7 @@ const ReviewCardListConnectedContainer: React.FC<Props> = ({
           : undefined
       }
       before={before}
+      toolbar={toolbar}
       highlight={variables?.query?.toLowerCase()}
     />
   );

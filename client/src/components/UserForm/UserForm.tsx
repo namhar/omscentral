@@ -6,15 +6,27 @@ import Typography from '@material-ui/core/Typography';
 import AccountIcon from '@material-ui/icons/AccountCircleOutlined';
 import React, { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import { Program, Specialization, UserInputType, UserQuery } from 'src/graphql';
+import { useHistory } from 'react-router-dom';
+import { paths } from 'src/constants';
+import {
+  InputMaybe,
+  PricingTier,
+  Program,
+  Scalars,
+  Specialization,
+  UserInputType,
+  UserQuery,
+} from 'src/graphql';
 
 import Button from '../Button';
+import { useFeatures } from '../Features';
 import Paper from '../Paper';
 import White from '../White';
 import { useStyles } from './UserForm.styles';
 
 interface Props {
   data: {
+    pricingTiers: PricingTier[];
     programs: Program[];
     specializations: Specialization[];
   };
@@ -32,7 +44,14 @@ const UserForm: React.FC<Props> = ({
   onSubmit,
 }) => {
   const classes = useStyles();
-  const form = useForm<UserInputType>({ defaultValues: user });
+  const history = useHistory();
+
+  const { isEnabled } = useFeatures();
+  const mayNotUse = !isEnabled('spec');
+
+  const form = useForm<
+    UserInputType & { pricing_tier: InputMaybe<Scalars['String']> }
+  >({ defaultValues: user });
   const { handleSubmit, register, errors, watch } = form;
   const { program_id } = watch();
 
@@ -44,8 +63,14 @@ const UserForm: React.FC<Props> = ({
     [data.specializations, program_id],
   );
 
+  const handleSpecializationClick = () => {
+    if (mayNotUse) {
+      history.push(paths.pricing(true));
+    }
+  };
+
   const [title, action] =
-    mode === 'edit' ? ['Update User', 'Update'] : ['User', null];
+    mode === 'edit' ? ['Update Profile', 'Update'] : ['User', null];
 
   return (
     <Container component="main" maxWidth="sm">
@@ -100,6 +125,31 @@ const UserForm: React.FC<Props> = ({
                 />
               </Grid>
             )}
+            {user?.pricing_tier && (
+              <Grid item xs={12}>
+                <TextField
+                  select
+                  data-cy="user:pricing_tier"
+                  id="pricing_tier"
+                  name="pricing_tier"
+                  label="Subscription Plan"
+                  autoComplete="pricing_tier"
+                  variant="outlined"
+                  fullWidth
+                  disabled
+                  inputRef={register({ required: true })}
+                  error={Boolean(errors.pricing_tier)}
+                  helperText={errors.pricing_tier?.message}
+                  SelectProps={{ native: true }}
+                >
+                  {data.pricingTiers.map(({ id, name, price }) => (
+                    <option key={id} value={id}>
+                      {`${name} ($${price.amount})`}
+                    </option>
+                  ))}
+                </TextField>
+              </Grid>
+            )}
             <Grid item xs={12}>
               <TextField
                 data-cy="user:name"
@@ -151,14 +201,13 @@ const UserForm: React.FC<Props> = ({
                 autoComplete="specialization_id"
                 variant="outlined"
                 fullWidth
-                required
-                disabled={
-                  disabled || mode === 'view' || !specializations.length
-                }
-                inputRef={register({ required: true })}
+                required={!!specializations.length}
+                disabled={disabled || mode === 'view'}
+                inputRef={register({ required: !!specializations.length })}
                 error={Boolean(errors.specialization_id)}
                 helperText={errors.specialization_id?.message}
                 SelectProps={{ native: true }}
+                onClick={handleSpecializationClick}
               >
                 {specializations.map(({ id, name }) => (
                   <option key={id} value={id}>

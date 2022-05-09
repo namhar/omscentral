@@ -1,21 +1,29 @@
+import Grid from '@material-ui/core/Grid';
 import React from 'react';
 import Metrics from 'src/components/Metrics';
 import ReviewCardListConnected from 'src/components/ReviewCardListConnected';
-import { Course as GraphQLCourse } from 'src/graphql';
+import { Course as GQLCourse } from 'src/graphql';
 
-import { useStyles } from './Course.styles';
+import LimitedReviewsGuidance from '../LimitedReviewsGuidance';
 
 interface Props {
-  course: GraphQLCourse;
+  course: GQLCourse;
 }
 
-const Course: React.FC<Props> = ({ course }) => {
-  const classes = useStyles();
-
+const Course: React.VFC<Props> = ({ course }) => {
   return (
     <ReviewCardListConnected
       variables={{ course_ids: [course.id] }}
-      before={<Metrics className={classes.metrics} course={course} />}
+      before={
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <LimitedReviewsGuidance />
+          </Grid>
+          <Grid item xs={12}>
+            <Metrics course={course} />
+          </Grid>
+        </Grid>
+      }
     />
   );
 };

@@ -6,7 +6,7 @@ export const useStyles = makeStyles((theme) => ({
   },
   metric: {
     textAlign: 'center',
-    padding: theme.spacing(2),
+    padding: theme.spacing(2, 2, 0, 2),
     borderRight: '1px solid #efefef',
     '&:last-child': {
       borderRight: 'none',

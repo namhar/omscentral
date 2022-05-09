@@ -1,15 +1,19 @@
+import { Theme, useMediaQuery } from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import { SelectInputProps } from '@material-ui/core/Select/SelectInput';
+import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import { logEvent } from 'firebase/analytics';
-import React, { useContext } from 'react';
-import { FirebaseContext } from 'src/components/Firebase/Firebase';
+import React from 'react';
+import { useHistory } from 'react-router-dom';
+import { useFeatures } from 'src/components/Features';
+import { useFirebase } from 'src/components/Firebase';
+import { paths } from 'src/constants';
 import { Nullable } from 'src/core';
 import { Specialization } from 'src/graphql';
-
 interface Props {
   className?: string;
   onChange: (changeTo: Nullable<Specialization>) => void;
@@ -23,9 +27,21 @@ const SpecializationSelect: React.FC<Props> = ({
   options,
   value,
 }) => {
-  const firebase = useContext(FirebaseContext);
+  const xs = useMediaQuery<Theme>((theme) => theme.breakpoints.down('xs'));
+  const history = useHistory();
 
-  const handleSpecializationChange: SelectInputProps['onChange'] = (event) => {
+  const firebase = useFirebase();
+
+  const { isEnabled } = useFeatures();
+  const mayNotUse = !isEnabled('spec');
+
+  const handleFocus: SelectInputProps['onFocus'] = () => {
+    if (mayNotUse) {
+      history.push(paths.pricing(true));
+    }
+  };
+
+  const handleChange: SelectInputProps['onChange'] = (event) => {
     const id = event.target.value;
     if (!id) {
       return onChange(null);
@@ -45,11 +61,7 @@ const SpecializationSelect: React.FC<Props> = ({
     onChange(specialization);
   };
 
-  if (!options?.length) {
-    return null;
-  }
-
-  return (
+  const control = (
     <FormControl variant="filled" className={className}>
       <InputLabel id="specialization-label">Specialization</InputLabel>
       <Select
@@ -57,18 +69,30 @@ const SpecializationSelect: React.FC<Props> = ({
         labelId="specialization-label"
         id="specialization"
         value={value?.id || ''}
-        onChange={handleSpecializationChange}
+        onFocus={handleFocus}
+        onChange={handleChange}
       >
         <MenuItem value="">
           <Typography variant="overline">None</Typography>
         </MenuItem>
-        {options.map(({ id, name }) => (
+        {options?.map(({ id, name }) => (
           <MenuItem key={id} value={id}>
             {name}
           </MenuItem>
         ))}
       </Select>
     </FormControl>
+  );
+
+  return mayNotUse ? (
+    <Tooltip
+      title="This feature requires a Standard subscription"
+      placement={xs ? 'top' : 'right'}
+    >
+      {control}
+    </Tooltip>
+  ) : (
+    control
   );
 };
 

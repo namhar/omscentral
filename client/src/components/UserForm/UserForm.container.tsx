@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import assignDefined from 'src/core/utils/assignDefined';
 import {
+  usePricingTiersQuery,
   useProgramsQuery,
   UserInputType,
   UserQuery,
@@ -21,7 +22,8 @@ const UserFormContainer: React.FC<Props> = ({ user }) => {
   const auth = useContext(AuthContext);
   const mode = auth.user?.uid === user.id ? 'edit' : 'view';
 
-  const [programs, specializations] = [
+  const [pricingTiers, programs, specializations] = [
+    usePricingTiersQuery(),
     useProgramsQuery(),
     useSpecializationsQuery(),
   ];
@@ -30,21 +32,42 @@ const UserFormContainer: React.FC<Props> = ({ user }) => {
 
   const handleSubmit = async (data: UserInputType) => {
     try {
-      const { __typename, ...rest } = user;
-      await update({ variables: { user: assignDefined(rest, data) } });
+      await update({
+        variables: {
+          user: assignDefined(
+            {
+              id: user.id,
+
+              auth_provider: user.auth_provider,
+              email: user.email,
+              name: user.name,
+              photo_url: user.photo_url,
+              last_signed_in: user.last_signed_in,
+
+              program_id: user.program_id,
+              specialization_id: user.specialization_id,
+            },
+            data,
+          ),
+        },
+      });
       notification.success('User updated.');
     } catch {
       notification.error('Something went wrong.');
     }
   };
 
-  if (!programs.data?.programs || !specializations.data?.specializations) {
+  if (
+    !pricingTiers.data?.pricingTiers ||
+    !programs.data?.programs ||
+    !specializations.data?.specializations
+  ) {
     return null;
   }
 
   return (
     <UserForm
-      data={{ ...programs.data, ...specializations.data }}
+      data={{ ...pricingTiers.data, ...programs.data, ...specializations.data }}
       mode={mode}
       user={user}
       disabled={loading}

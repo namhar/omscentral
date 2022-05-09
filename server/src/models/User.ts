@@ -1,6 +1,9 @@
+import { Pojo } from 'objection';
 import { QueryBuilder } from 'objection';
 
-import { AuthProvider, Role } from '../enums';
+import { AuthProvider, PricingTier, Role } from '../enums';
+import { Maybe } from '../graphql';
+import { UnixTime } from '../types';
 import { Domain } from './Domain';
 import { Program } from './Program';
 import { Specialization } from './Specialization';
@@ -9,19 +12,29 @@ import { withDates } from './utils';
 export class User extends withDates(Domain) {
   id!: string;
   auth_provider!: AuthProvider;
-  password_hash!: string | null;
-  password_salt!: string | null;
-  email!: string | null;
-  name!: string | null;
+  password_hash!: Maybe<string>;
+  password_salt!: Maybe<string>;
+  email!: Maybe<string>;
+  customer_id!: Maybe<string>; // from payment processor
+  pricing_tier!: Maybe<PricingTier>; // nonnull if user has subscribed
+  name!: Maybe<string>;
   role!: Role;
-  photo_url!: string | null;
+  photo_url!: Maybe<string>;
   anonymous!: boolean;
-  program_id!: string | null;
-  specialization_id!: string | null;
-  last_signed_in!: number;
+  program_id!: Maybe<string>;
+  specialization_id!: Maybe<string>;
+  last_signed_in!: UnixTime;
 
-  program!: Program | null;
-  specialization!: Specialization | null;
+  program!: Maybe<Program>;
+  specialization!: Maybe<Specialization>;
+
+  $parseDatabaseJson(json: Pojo): Pojo {
+    super.$parseDatabaseJson(json);
+    return {
+      ...json,
+      last_signed_in: json.last_signed_in && Number(json.last_signed_in),
+    };
+  }
 
   static tableName = 'omscentral_user';
 
@@ -53,6 +66,8 @@ export class User extends withDates(Domain) {
       password_hash: { type: ['string', 'null'] },
       password_salt: { type: ['string', 'null'] },
       email: { type: ['string', 'null'] },
+      customer_id: { type: ['string', 'null'] },
+      pricing_tier: { type: ['string', 'null'] },
       name: { type: ['string', 'null'] },
       role: { type: 'string' },
       photo_url: { type: ['string', 'null'] },

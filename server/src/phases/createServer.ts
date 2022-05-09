@@ -6,10 +6,8 @@ import { applyMiddleware } from 'graphql-middleware';
 import path from 'path';
 
 import { Mutation, permissions, Query } from '../api';
-import { logger } from '../components';
-import { PhaseFunction } from '../components';
-import { appConfig } from '../config';
-import { graphqlConfig } from '../config';
+import { logger, PhaseFunction } from '../components';
+import { appConfig, graphqlConfig } from '../config';
 import { root } from '../constants';
 import { getUser } from '../functions';
 import { Context, Request } from '../types';
@@ -34,13 +32,21 @@ export const phase: PhaseFunction = (app, next) => {
       Query,
       Mutation,
     },
-    context: async ({ req, res }: { req: Request; res: Response }) => {
+    context: async ({
+      req,
+      res,
+    }: {
+      req: Request;
+      res: Response;
+    }): Promise<Context> => {
       const { userId } = req;
-
+      const user = userId ? await getUser(userId) : null;
       return {
         req,
         res,
-        user: userId ? await getUser(userId) : null,
+        user,
+        features: req.features,
+        pp: req.pp,
         logger,
       };
     },

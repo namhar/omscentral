@@ -1,6 +1,6 @@
 import Grid from '@material-ui/core/Grid';
 import MaterialPaper from '@material-ui/core/Paper';
-import UITable, { Size } from '@material-ui/core/Table';
+import MUITable, { Size } from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
@@ -15,6 +15,7 @@ import { Course, Semester } from 'src/graphql';
 import HeadCell from '../HeadCell';
 import SemesterHistory from '../SemesterHistory';
 import Stats from '../Stats';
+import TableMetricCell from '../TableMetricCell';
 import { useStyles } from './Table.styles';
 
 const columns = [
@@ -67,7 +68,7 @@ const Table: React.FC<Props> = ({
     <Grid container>
       {before}
       <TableContainer component={MaterialPaper}>
-        <UITable className={classes.table} size={size} aria-label="courses">
+        <MUITable className={classes.table} size={size} aria-label="courses">
           <TableHead>
             <TableRow>
               {columns.map((key) => (
@@ -96,28 +97,53 @@ const Table: React.FC<Props> = ({
                   {course.foundational && <sup>f</sup>}
                   {course.deprecated && <sup>d</sup>}
                 </TableCell>
-                <TableCell align="center">
-                  {course.metric?.reviews.count}
-                </TableCell>
-                <TableCell align="center">
-                  <Stats {...course.metric?.reviews.difficulty} />
-                </TableCell>
-                <TableCell align="center">
-                  <Stats {...course.metric?.reviews.workload} />
-                </TableCell>
-                <TableCell align="center">
-                  <Stats {...course.metric?.reviews.rating} />
-                </TableCell>
-                <TableCell align="center">
+                <TableMetricCell
+                  center
+                  type="count"
+                  metric={course.metric}
+                  feature={course.id !== 'CS-6035' ? 'all.reviews' : undefined}
+                >
+                  {course.metric?.reviews?.count}
+                </TableMetricCell>
+                <TableMetricCell
+                  center
+                  type="difficulty"
+                  metric={course.metric}
+                  feature={course.id !== 'CS-6035' ? 'metrics' : undefined}
+                >
+                  <Stats {...course.metric?.reviews?.difficulty} />
+                </TableMetricCell>
+                <TableMetricCell
+                  center
+                  type="workload"
+                  metric={course.metric}
+                  feature={course.id !== 'CS-6035' ? 'metrics' : undefined}
+                >
+                  <Stats {...course.metric?.reviews?.workload} />
+                </TableMetricCell>
+                <TableMetricCell
+                  center
+                  type="rating"
+                  metric={course.metric}
+                  feature={course.id !== 'CS-6035' ? 'metrics' : undefined}
+                >
+                  <Stats {...course.metric?.reviews?.rating} />
+                </TableMetricCell>
+                <TableMetricCell
+                  center
+                  type="semesters"
+                  metric={course.metric}
+                  feature={course.id !== 'CS-6035' ? 'metrics' : undefined}
+                >
                   <SemesterHistory
                     semesters={semesters}
                     history={course.metric?.semesters || []}
                   />
-                </TableCell>
+                </TableMetricCell>
               </TableRow>
             ))}
           </TableBody>
-        </UITable>
+        </MUITable>
       </TableContainer>
     </Grid>
   );

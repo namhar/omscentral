@@ -19,6 +19,10 @@ const Error404: React.FC = () => <Redirect to={paths.error(404)} />;
 
 const routes: Route[] = [
   {
+    path: paths.pricing(),
+    component: lazy(() => import('./components/Pricing')),
+  },
+  {
     path: paths.privacy,
     component: lazy(() => import('./components/Privacy')),
   },
@@ -86,6 +90,11 @@ const routes: Route[] = [
   {
     path: paths.userProfile,
     component: lazy(() => import('./components/UserProfile')),
+    auth: true,
+  },
+  {
+    path: paths.userSubscription,
+    component: lazy(() => import('./components/UserSubscription')),
     auth: true,
   },
   {

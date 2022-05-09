@@ -1,3 +1,5 @@
+import { FeatureAlias } from '../enums';
+import { Features } from '../utils';
 import { Domain } from './Domain';
 
 interface Stats {
@@ -7,6 +9,14 @@ interface Stats {
   min: number;
   max: number;
 }
+
+const emptyStats: Stats = {
+  mean: 0,
+  median: 0,
+  mode: 0,
+  min: 0,
+  max: 0,
+};
 
 const statsSchema = {
   type: 'object',
@@ -54,4 +64,22 @@ export class CourseMetric extends Domain {
       semesters: { type: 'array', items: { type: 'string' } },
     },
   };
+
+  public $cloneEmpty(features: Features): CourseMetric {
+    const clone = this.$clone();
+
+    if (!features.isEnabled(FeatureAlias.AllReviews)) {
+      clone.reviews.count = 0;
+    }
+
+    if (!features.isEnabled(FeatureAlias.Metrics)) {
+      clone.reviews.difficulty = { ...emptyStats };
+      clone.reviews.workload = { ...emptyStats };
+      clone.reviews.rating = { ...emptyStats };
+
+      clone.semesters = [];
+    }
+
+    return clone;
+  }
 }

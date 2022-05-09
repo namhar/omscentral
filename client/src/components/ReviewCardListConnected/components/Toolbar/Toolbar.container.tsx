@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { reviewMeta } from 'src/constants/reviewMeta';
 import { semesterMeta } from 'src/constants/semesterMeta';
 import { Option, QueryParam, ReviewSortKey as SortKey } from 'src/core';
@@ -13,6 +13,7 @@ type Props = Omit<
   | 'courseFilterOptions'
   | 'semesterFilterOptions'
   | 'difficultyFilterOptions'
+  | 'ratingFilterOptions'
   | 'sortKeyOptions'
 >;
 
@@ -20,6 +21,10 @@ const sortKeyOptions = [
   { value: SortKey.Semester, label: 'Semester' },
   { value: SortKey.Created, label: 'Created' },
 ];
+
+const difficultyFilterOptions: Option<number>[] = [...reviewMeta.difficulty];
+
+const ratingFilterOptions: Option<number>[] = [...reviewMeta.rating];
 
 const ToolbarContainer: React.FC<Props> = (props) => {
   const { query } = useQueryParams<{ [QueryParam.Query]: string }>();
@@ -52,26 +57,27 @@ const ToolbarContainer: React.FC<Props> = (props) => {
       label: semesterMeta.translateSeason(semester.season),
     }));
 
-  const difficultyFilterOptions: Option<number>[] = [...reviewMeta.difficulty];
-
-  return (
-    <Toolbar
-      {...props}
-      {...(query
+  const rest = useMemo(
+    () =>
+      query
         ? {
             courseFilterOptions: [],
             semesterFilterOptions: [],
             difficultyFilterOptions: [],
+            ratingFilterOptions: [],
             sortKeyOptions,
           }
         : {
             courseFilterOptions,
             semesterFilterOptions,
             difficultyFilterOptions,
+            ratingFilterOptions,
             sortKeyOptions,
-          })}
-    />
+          },
+    [query, courseFilterOptions, semesterFilterOptions],
   );
+
+  return <Toolbar {...props} {...rest} />;
 };
 
 export default ToolbarContainer;

@@ -7,6 +7,9 @@ import { logger } from './components';
 
 app.boot((error?: Error) => {
   if (error) {
+    if (process.env.NODE_ENV === 'local') {
+      console.log(error); // eslint-disable-line no-console
+    }
     throw error;
   }
 

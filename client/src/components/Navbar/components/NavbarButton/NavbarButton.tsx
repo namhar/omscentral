@@ -3,8 +3,8 @@ import React from 'react';
 import { useHistory } from 'react-router';
 
 interface Props {
-  path: string;
-  onClick?: () => void | Promise<void>;
+  path?: string;
+  onClick?: () => void | Promise<void> | any;
   'data-cy'?: string;
 }
 
@@ -18,11 +18,11 @@ const NavbarButton: React.FC<Props> = ({
 
   const handleClick = async () => {
     onClick && (await onClick());
-    history.push(path);
+    path && history.push(path);
   };
 
   return (
-    <Button color="inherit" onClick={handleClick} {...rest}>
+    <Button color="inherit" onClick={handleClick} disableRipple {...rest}>
       {children}
     </Button>
   );

@@ -1,6 +1,7 @@
 import BarChartIcon from '@material-ui/icons/BarChart';
 import BugReportIcon from '@material-ui/icons/BugReport';
 import EditIcon from '@material-ui/icons/Edit';
+import HelpIcon from '@material-ui/icons/Help';
 import SpeedDial from '@material-ui/lab/SpeedDial';
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
 import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
@@ -16,6 +17,7 @@ enum ActionKey {
   CreateReview = 'create_review',
   OpenTableau = 'open_tableau',
   ReportIssue = 'report_issue',
+  GetSupport = 'get_support',
 }
 
 interface Action {
@@ -41,6 +43,11 @@ const actions: Action[] = [
     key: ActionKey.ReportIssue,
     name: 'Report Issue',
     icon: <BugReportIcon />,
+  },
+  {
+    key: ActionKey.GetSupport,
+    name: 'Get Support',
+    icon: <HelpIcon />,
   },
 ];
 
@@ -70,9 +77,9 @@ const Actions: React.FC = () => {
       case ActionKey.CreateReview:
         return history.push(paths.review.create);
       case ActionKey.OpenTableau:
-        return window.open(urls.tableau); // eslint-disable-line
+        return window.open(urls.tableau);
       case ActionKey.ReportIssue:
-        return window.open(urls.bugs); // eslint-disable-line
+        return window.open(urls.bugs);
       default:
         return;
     }

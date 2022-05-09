@@ -46,31 +46,35 @@ Finally, go to "Settings" > "Service accounts" tab, click "Generate new private 
 First, copy the default environment variables file:
 
 ```sh
-cp .env.example .env
+cp .env.example .env.local
 ```
 
-Then, complete `.env` based on the following expectations:
+Then, complete `.env.local` based on the following expectations:
 
-| variable                         | description                                                                                   |
-| -------------------------------- | --------------------------------------------------------------------------------------------- |
-| NODE_ENV                         | `"local"`, `"test"`, OR `"production"` (recommend `"local"`)                                  |
-| PORT                             | port expected by `../client` (recommend `8080` ... must not be `3000`)                        |
-| OMSCENTRAL_CORS_ALLOWLIST        | OPTIONAL: comma-delimited list of allowed CORS origins (leave empty for no CORS)              |
-| OMSCENTRAL_DISABLE_RATE_LIMIT    | OPTIONAL: if `true`, disables api rate limiting                                               |
-| OMSCENTRAL_GRAPHQL_PLAYGROUND    | OPTIONAL: if `true`, graphql playground is enabled at `<host>/graphql`                        |
-| OMSCENTRAL_GRAPHQL_REPORT_SCHEMA | OPTIONAL: if `true`, reports schema to apollo studio                                          |
-| OMSCENTRAL_LOG_LEVEL             | OPTIONAL: winston log level                                                                   |
-| OMSCENTRAL_MORGAN_FORMAT         | OPTIONAL: predefined [morgan format](https://www.npmjs.com/package/morgan#predefined-formats) |
-| OMSCENTRAL_FIREBASE_PRIVATE_KEY  | from firebase private key json                                                                |
-| OMSCENTRAL_FIREBASE_CLIENT_EMAIL | from firebase private key json                                                                |
-| OMSCENTRAL_FIREBASE_PROJECT_ID   | from firebase private key json                                                                |
-| OMSCENTRAL_FIREBASE_DATABASE_URL | URL of the database that you created under the Firebase section above                         |
-| OMSCENTRAL_POSTGRES_CONNECTION   | postgres connection string (defaults to process.env.DATABASE_URL)                             |
-| OMSCENTRAL_SENTRY_DSN            | OPTIONAL: sentry uri for issue logging                                                        |
-| OMSCENTRAL_SLACK_WEBHOOK_URL     | OPTIONAL: slack webhook url for realtime slack notifications                                  |
-| APOLLO_KEY                       | OPTIONAL: api key for apollo studio metrics logging                                           |
-| SEARCHBOX_URL                    | OPTIONAL: elastic search web api host URI                                                     |
-| SEARCHBOX_SSL_URL                | OPTIONAL: elastic search web api host URI (overrides `SEARCHBOX_URL`)                         |
+| variable                                 | description                                                                                             |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| NODE_ENV                                 | `"local"`, `"test"`, OR `"production"` (recommend `"local"`)                                            |
+| PORT                                     | port expected by `../client` (recommend `8080` ... must not be `3000`)                                  |
+| OMSCENTRAL_CLIENT_URL                    | base URL of the client WWW application (for local dev, must point to where `../client` is hosted)       |
+| OMSCENTRAL_CORS_ALLOWLIST                | OPTIONAL: comma-delimited list of allowed CORS origins (leave empty for no CORS)                        |
+| OMSCENTRAL_DISABLE_RATE_LIMIT            | OPTIONAL: if `true`, disables api rate limiting                                                         |
+| OMSCENTRAL_GRAPHQL_PLAYGROUND            | OPTIONAL: if `true`, graphql playground is enabled at `<host>/graphql`                                  |
+| OMSCENTRAL_GRAPHQL_REPORT_SCHEMA         | OPTIONAL: if `true`, reports schema to apollo studio                                                    |
+| OMSCENTRAL_LOG_LEVEL                     | OPTIONAL: winston log level                                                                             |
+| OMSCENTRAL_MORGAN_FORMAT                 | OPTIONAL: predefined [morgan format](https://www.npmjs.com/package/morgan#predefined-formats)           |
+| OMSCENTRAL_FIREBASE_PRIVATE_KEY          | from firebase private key json                                                                          |
+| OMSCENTRAL_FIREBASE_CLIENT_EMAIL         | from firebase private key json                                                                          |
+| OMSCENTRAL_FIREBASE_PROJECT_ID           | from firebase private key json                                                                          |
+| OMSCENTRAL_FIREBASE_DATABASE_URL         | URL of the database that you created under the Firebase section above                                   |
+| OMSCENTRAL_POSTGRES_CONNECTION           | postgres connection string (defaults to process.env.DATABASE_URL)                                       |
+| OMSCENTRAL_SENTRY_DSN                    | OPTIONAL: sentry uri for issue logging                                                                  |
+| OMSCENTRAL_SLACK_WEBHOOK_URL             | OPTIONAL: slack webhook url for realtime slack notifications                                            |
+| OMSCENTRAL_STRIPE_API_KEY                | OPTIONAL: stripe api key (required for checkout experience)                                             |
+| OMSCENTRAL_STRIPE_ENDPOINT_SECRET        | OPTIONAL: stripe endpoint secret (required for webhooks)                                                |
+| OMSCENTRAL_STRIPE_TIER\_\{X\}\_\{Y\}\_ID | OPTIONAL: stripe product/price IDs for the subscription plans (\{X\} = 1\|2\|3, \{Y\} = PRODUCT\|PRICE) |
+| APOLLO_KEY                               | OPTIONAL: api key for apollo studio metrics logging                                                     |
+| SEARCHBOX_URL                            | OPTIONAL: elastic search web api host URI                                                               |
+| SEARCHBOX_SSL_URL                        | OPTIONAL: elastic search web api host URI (overrides `SEARCHBOX_URL`)                                   |
 
 ## Migrations
 

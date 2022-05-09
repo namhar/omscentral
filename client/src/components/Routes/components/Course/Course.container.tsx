@@ -10,15 +10,21 @@ import Course from './Course';
 
 const CourseContainer: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { semester: semester_ids, difficulty: difficulties } = useQueryParams<{
+  const {
+    semester: semester_ids,
+    difficulty: difficulties,
+    rating: ratings,
+  } = useQueryParams<{
     [QueryParam.Semester]: string[];
     [QueryParam.Difficulty]: string[];
+    [QueryParam.Rating]: string[];
   }>();
   const { data } = useCourseQuery({
     variables: {
       id,
       semester_ids: asArray<string>(semester_ids),
-      difficulties: asArray<string>(difficulties).map((_) => Number(_)),
+      difficulties: asArray<string>(difficulties).map((x) => Number(x)),
+      ratings: asArray<string>(ratings).map((x) => Number(x)),
     },
     fetchPolicy: 'no-cache',
   });

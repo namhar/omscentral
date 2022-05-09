@@ -30,6 +30,8 @@ export const seed = async (knex: Knex): Promise<void> => {
     {
       anonymous: false,
       auth_provider: AuthProvider.Password,
+      customer_id: null,
+      pricing_tier: null,
       created: timestamp,
       email: 'user@omscentral.com',
       id: '2iAc9zFUeUcCblZ68PTOqdFdpSr1',

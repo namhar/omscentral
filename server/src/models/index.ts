@@ -2,6 +2,7 @@ export * from './Config';
 export * from './Course';
 export * from './CourseMetric';
 export * from './Domain';
+export * from './Feature';
 export * from './Migration';
 export * from './MigrationLock';
 export * from './Program';

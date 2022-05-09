@@ -1,0 +1,11 @@
+query features {
+  features {
+    id
+    alias
+    name
+    description
+    pricing_tier
+    release_date
+    status
+  }
+}

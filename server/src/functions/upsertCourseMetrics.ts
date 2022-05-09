@@ -14,7 +14,7 @@ export const upsertCourseMetrics: UpsertCourseMetrics = async (
     .modify((query) => courseId != null && query.where('course_id', courseId));
 
   const [metrics] = await Promise.all([
-    getCourseMetrics(courseId ? [courseId] : [], [], []),
+    getCourseMetrics(courseId ? [courseId] : [], [], [], []),
     dropCurrentMetrics,
   ]);
 

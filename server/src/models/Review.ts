@@ -1,6 +1,7 @@
 import { QueryBuilder } from 'objection';
 
 import { Difficulty, Rating } from '../enums';
+import { Maybe } from '../graphql';
 import { Course } from './Course';
 import { Domain } from './Domain';
 import { ReviewReport } from './ReviewReport';
@@ -13,21 +14,10 @@ export class Review extends withDates(Domain) {
   author_id!: string;
   course_id!: string;
   semester_id!: string;
-  difficulty!: Difficulty | null;
-  rating!: Rating | null;
-  workload!: number | null;
-  body!: string | null;
-  meta!: {
-    extraCredit: boolean;
-    firstCourse: boolean;
-    frontLoad: boolean;
-    groupProjects: number | null;
-    moneySpent: number | null;
-    proctortrack: boolean | null;
-    program: number | null;
-    projects: number | null;
-    tests: number | null;
-  } | null;
+  difficulty!: Maybe<Difficulty>;
+  rating!: Maybe<Rating>;
+  workload!: Maybe<number>;
+  body!: Maybe<string>;
 
   author!: User;
   course!: Course;
@@ -101,4 +91,17 @@ export class Review extends withDates(Domain) {
       semester,
       reports
     ]`);
+
+  // this is legacy metadata that may some day have use...
+  meta!: Maybe<{
+    extraCredit: boolean;
+    firstCourse: boolean;
+    frontLoad: boolean;
+    groupProjects: Maybe<number>;
+    moneySpent: Maybe<number>;
+    proctortrack: Maybe<boolean>;
+    program: Maybe<number>;
+    projects: Maybe<number>;
+    tests: Maybe<number>;
+  }>;
 }

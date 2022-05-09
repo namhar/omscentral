@@ -8,3 +8,4 @@ export { config as morganConfig } from './morgan';
 export { config as postgresConfig } from './postgres';
 export { config as sentryConfig } from './sentry';
 export { config as slackConfig } from './slack';
+export { config as stripeConfig } from './stripe';

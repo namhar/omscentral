@@ -5,7 +5,7 @@ import React from 'react';
 
 interface Props {
   className?: string;
-  label: string;
+  label: React.ReactElement | string;
   value: boolean;
   onChange: (value: boolean) => void;
 }

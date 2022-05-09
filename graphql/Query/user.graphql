@@ -5,6 +5,8 @@ query user($id: String!) {
     email
     name
     photo_url
+    customer_id
+    pricing_tier
     program_id
     specialization_id
     last_signed_in

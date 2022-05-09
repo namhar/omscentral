@@ -1,5 +1,7 @@
 import { QueryBuilder } from 'objection';
 
+import { Maybe } from '../graphql';
+import { Features } from '../utils';
 import { CourseMetric } from './CourseMetric';
 import { Domain } from './Domain';
 
@@ -11,9 +13,9 @@ export class Course extends Domain {
   aliases!: string[];
   foundational!: boolean;
   deprecated!: boolean;
-  link!: string | null;
+  link!: Maybe<string>;
 
-  metric!: CourseMetric;
+  metric!: Maybe<CourseMetric>;
 
   static tableName = 'omscentral_course';
 
@@ -55,4 +57,13 @@ export class Course extends Domain {
 
   static eagerQuery = (): QueryBuilder<Course> =>
     Course.query().withGraphFetched('[metric]');
+
+  public withoutMetrics(features: Features): Course {
+    if (this.metric == null || this.id === 'CS-6035') {
+      return this;
+    }
+    const clone = this.$clone();
+    clone.metric = this.metric.$cloneEmpty(features);
+    return clone;
+  }
 }

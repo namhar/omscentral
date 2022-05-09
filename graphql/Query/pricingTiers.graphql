@@ -1,0 +1,11 @@
+query pricingTiers {
+  pricingTiers {
+    id
+    name
+    features
+    price {
+      amount
+      currency
+    }
+  }
+}

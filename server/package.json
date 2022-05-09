@@ -8,7 +8,10 @@
   "main": "dist/src/server.js",
   "scripts": {
     "build": "npm run tsc",
-    "dev": "npm run watch:api",
+    "dev": "npm run dev:local",
+    "dev:local": "env-cmd -f .env npm run watch:api",
+    "dev:production": "env-cmd -f .env.production npm run watch:api",
+    "dev:staging": "env-cmd -f .env.staging npm run watch:api",
     "format": "prettier --write '(src|database)/{**/*,*}.{js,ts,json}' && prettier --write '*.{js,json}' && prettier --write --parser json '.prettierrc'",
     "format:package": "prettier-package-json --write ./package.json",
     "knex": "knex --knexfile database/knexfile.ts",
@@ -55,6 +58,7 @@
     "pg": "8.7.3",
     "request": "2.88.2",
     "request-promise": "4.2.6",
+    "stripe": "^8.222.0",
     "winston": "3.7.2"
   },
   "devDependencies": {
@@ -84,6 +88,7 @@
     "chokidar-cli": "3.0.0",
     "concurrently": "6.x",
     "cross-env": "7.0.3",
+    "env-cmd": "10.1.0",
     "eslint": "7.x",
     "eslint-plugin-flowtype": "8.0.3",
     "eslint-plugin-graphql": "4.0.0",

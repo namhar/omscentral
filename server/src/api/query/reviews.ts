@@ -1,3 +1,8 @@
+import { badRequest } from '@hapi/boom';
+import { isEmpty, map } from 'lodash';
+import moment from 'moment';
+
+import { FeatureAlias } from '../../enums';
 import { searchReviews as search } from '../../functions';
 import { QueryResolvers } from '../../graphql';
 import { mapReview } from '../../mappers';
@@ -15,30 +20,52 @@ export const resolver: Resolver = async (
     course_ids,
     semester_ids,
     difficulties,
+    ratings,
     order_by_desc,
   },
-  { user },
+  { user, features },
 ) => {
-  if (query) {
-    const ids = await search({ query, offset, limit, sort: order_by_desc });
-    return ids.length
-      ? await Review.eagerQuery()
-          .whereIn('id', ids)
-          .modify((qb) => {
-            order_by_desc.forEach((column) => qb.orderBy(column, 'desc'));
-          })
-          .then((reviews) => reviews.map((review) => mapReview(review, user)))
-      : [];
+  if (limit > 10) {
+    throw badRequest();
   }
 
-  return await Review.eagerQuery()
-    .modify((qb) => {
-      qb.offset(offset).limit(limit);
-      course_ids.length && qb.whereIn('course_id', course_ids);
-      is_mine && user != null && qb.where('author_id', user.id);
-      semester_ids.length && qb.whereIn('semester_id', semester_ids);
-      difficulties.length && qb.whereIn('difficulty', difficulties);
-      order_by_desc.forEach((column) => qb.orderBy(column, 'desc'));
-    })
-    .then((reviews) => reviews.map((review) => mapReview(review, user)));
+  // if (is_mine && )
+
+  if (order_by_desc.includes('semester_id')) {
+    features.assertIsEnabled(FeatureAlias.Sorting);
+  }
+
+  const qb = Review.eagerQuery();
+
+  if (!features.isEnabled(FeatureAlias.AllReviews) && !is_mine) {
+    qb.where('created', '<', moment().subtract(2, 'years').valueOf());
+  }
+
+  order_by_desc.forEach((column) => qb.orderBy(column, 'desc'));
+
+  if (!isEmpty(query)) {
+    features.assertIsEnabled(FeatureAlias.Search);
+
+    const ids = await search({ query, offset, limit, sort: order_by_desc });
+    qb.whereIn('id', ids);
+  } else {
+    is_mine && user != null && qb.where('author_id', user.id);
+    qb.offset(offset).limit(limit);
+
+    if (
+      course_ids.length > 1 ||
+      semester_ids.length ||
+      difficulties.length ||
+      ratings.length
+    ) {
+      features.assertIsEnabled(FeatureAlias.Filtering);
+    }
+
+    course_ids.length && qb.whereIn('course_id', course_ids);
+    semester_ids.length && qb.whereIn('semester_id', semester_ids);
+    difficulties.length && qb.whereIn('difficulty', difficulties);
+    ratings.length && qb.whereIn('rating', ratings);
+  }
+
+  return map(await qb, (review) => mapReview(review, user));
 };

@@ -1,0 +1,6 @@
+query words($course_id: String!) {
+  words(course_id: $course_id) {
+    text
+    value
+  }
+}

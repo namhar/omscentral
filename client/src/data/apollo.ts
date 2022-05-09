@@ -30,8 +30,12 @@ const error = onError(({ networkError, graphQLErrors, operation }) => {
   });
 
   const { message } = (graphQLErrors || [])[0] || {};
-  const code = errorCodes[message] || 500;
-  browserHistory.push(paths.error(code));
+  const code = errorCodes[message];
+  if (message?.startsWith('feature.')) {
+    browserHistory.push(paths.pricing(true));
+  } else if (code != null) {
+    browserHistory.push(paths.error(code));
+  }
 });
 
 const auth = new ApolloLink((operation, forward) => {

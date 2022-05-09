@@ -11,6 +11,7 @@ export interface AppConfig {
   version: string;
   port: number;
   rateLimit: boolean;
+  clientUrl: string;
 }
 
 export const config: AppConfig = {
@@ -20,8 +21,13 @@ export const config: AppConfig = {
   version: pkg.version,
   port: Number(process.env.PORT) || 8080,
   rateLimit: process.env.OMSCENTRAL_DISABLE_RATE_LIMIT !== 'true',
+  clientUrl: process.env.OMSCENTRAL_CLIENT_URL || '',
 };
 
 if (!config.environment) {
   throw new Error('process.env.NODE_ENV required');
+}
+
+if (!config.clientUrl) {
+  throw new Error('process.env.OMSCENTRAL_CLIENT_URL required');
 }

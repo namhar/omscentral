@@ -1,0 +1,5 @@
+mutation createCustomerPortalSession($input: CustomerPortalSessionInputType!) {
+  createCustomerPortalSession(input: $input) {
+    url
+  }
+}

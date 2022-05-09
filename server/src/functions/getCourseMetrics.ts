@@ -2,7 +2,7 @@ import { isEmpty, without } from 'lodash';
 import { raw } from 'objection';
 
 import { unknownSemester } from '../constants';
-import { Difficulty } from '../enums';
+import { Difficulty, Rating } from '../enums';
 import { CourseMetric as CM, Domain, Review, ReviewReport } from '../models';
 
 class Metric extends Domain {
@@ -68,6 +68,7 @@ export const getCourseMetrics = async (
   courseIds: string[],
   semesterIds: string[],
   difficulties: Difficulty[],
+  ratings: Rating[],
 ): Promise<Pick<CM, 'course_id' | 'semesters' | 'reviews'>[]> => {
   const metrics = await Metric.query()
     .select('course_id')
@@ -89,17 +90,12 @@ export const getCourseMetrics = async (
       `${Review.tableName}.id`,
       `${ReviewReport.tableName}.review_id`,
     )
-    .modify(
-      (query) => courseIds.length && query.whereIn('course_id', courseIds),
-    )
-    .modify(
-      (query) =>
-        semesterIds.length && query.whereIn('semester_id', semesterIds),
-    )
-    .modify(
-      (query) =>
-        difficulties.length && query.whereIn('difficulty', difficulties),
-    )
+    .modify((qb) => {
+      courseIds.length && qb.whereIn('course_id', courseIds);
+      semesterIds.length && qb.whereIn('semester_id', semesterIds);
+      difficulties.length && qb.whereIn('difficulty', difficulties);
+      ratings.length && qb.whereIn('rating', ratings);
+    })
     .groupBy('course_id');
 
   return metrics.filter(isValid).map(toCourseMetrics);

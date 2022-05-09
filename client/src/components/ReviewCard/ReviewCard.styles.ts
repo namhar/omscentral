@@ -16,6 +16,11 @@ export const useStyles = makeStyles((theme) => ({
       padding: 0,
     },
   },
+  externalLink: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   content: {
     [theme.breakpoints.down('sm')]: {
       padding: 0,

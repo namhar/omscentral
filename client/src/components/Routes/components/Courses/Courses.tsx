@@ -7,7 +7,7 @@ import Alert from '@material-ui/lab/Alert';
 import React, { useContext, useEffect, useMemo } from 'react';
 import { useHistory } from 'react-router';
 import Banner from 'src/components/Banner';
-import { FirebaseContext } from 'src/components/Firebase/Firebase';
+import { FirebaseContext } from 'src/components/Firebase';
 import Link from 'src/components/Link';
 import Loading from 'src/components/Loading';
 import { NotificationContext } from 'src/components/Notification';
@@ -36,6 +36,8 @@ interface Props {
   onIsUnreviewedShownChange: (isShown: boolean) => void;
   isDeprecatedShown: boolean;
   onIsDeprecatedShownChange: (isShown: boolean) => void;
+  isNonFoundationalShown: boolean;
+  onIsNonFoundationalShownChange: (isShown: boolean) => void;
 }
 
 const Courses: React.FC<Props> = ({
@@ -49,6 +51,8 @@ const Courses: React.FC<Props> = ({
   onIsUnreviewedShownChange,
   isDeprecatedShown,
   onIsDeprecatedShownChange,
+  isNonFoundationalShown,
+  onIsNonFoundationalShownChange,
 }) => {
   const classes = useStyles();
   const sm = useMediaQuery<Theme>((theme) => theme.breakpoints.down('sm'));
@@ -81,23 +85,19 @@ const Courses: React.FC<Props> = ({
   );
 
   const handleCourseClick = (course: Course) => {
-    if (course.metric?.reviews.count) {
+    if (course.metric?.reviews.count == null) {
+      notification.warning('There are no reviews for this course.');
+    } else {
       logEvent(firebase.analytics, 'select_content', {
         content_type: 'course',
         content_id: course.id,
       });
       history.push(paths.course(course.id));
-    } else {
-      notification.warning('There are no reviews for this course.');
     }
   };
 
   if (loading) {
     return <Loading />;
-  }
-
-  if (!courses?.length) {
-    return null;
   }
 
   return (
@@ -152,9 +152,24 @@ const Courses: React.FC<Props> = ({
           </Grid>
           <Grid item sm={12}>
             <Toggle
-              label="Show deprecated?"
+              label={
+                <span>
+                  Show deprecated? <sup>d</sup>
+                </span>
+              }
               value={isDeprecatedShown}
               onChange={onIsDeprecatedShownChange}
+            />
+          </Grid>
+          <Grid item sm={12}>
+            <Toggle
+              label={
+                <span>
+                  Show non-foundational? <sup>f</sup>
+                </span>
+              }
+              value={isNonFoundationalShown}
+              onChange={onIsNonFoundationalShownChange}
             />
           </Grid>
         </Grid>

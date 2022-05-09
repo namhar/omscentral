@@ -6,6 +6,7 @@ query reviews(
   $course_ids: [String!]! = []
   $semester_ids: [String!]! = []
   $difficulties: [Int!]! = []
+  $ratings: [Int!]! = []
   $query: String = ""
 ) {
   reviews(
@@ -16,6 +17,7 @@ query reviews(
     course_ids: $course_ids
     semester_ids: $semester_ids
     difficulties: $difficulties
+    ratings: $ratings
     query: $query
   ) {
     id

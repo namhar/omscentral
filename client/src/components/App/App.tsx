@@ -4,9 +4,11 @@ import { browserHistory } from 'src/constants';
 
 import Actions from '../Actions';
 import { AuthContext } from '../Auth';
+import ConversionLogger from '../ConversionLogger';
 import ErrorBoundary from '../ErrorBoundary';
 import Loading from '../Loading';
 import Navbar from '../Navbar';
+import Notification from '../Notification';
 import Routes from '../Routes';
 import { useStyles } from './App.styles';
 
@@ -17,17 +19,20 @@ const App: React.FC = () => {
   return (
     <Router history={browserHistory}>
       <ErrorBoundary>
-        <Navbar />
-        {auth.initializing ? (
-          <Loading />
-        ) : (
-          <div className={classes.main}>
-            <Suspense fallback={<Loading />}>
-              <Routes />
-            </Suspense>
-          </div>
-        )}
-        <Actions />
+        <Notification>
+          <Navbar />
+          {auth.initializing ? (
+            <Loading />
+          ) : (
+            <div className={classes.main}>
+              <Suspense fallback={<Loading />}>
+                <Routes />
+              </Suspense>
+            </div>
+          )}
+          <Actions />
+          <ConversionLogger />
+        </Notification>
       </ErrorBoundary>
     </Router>
   );

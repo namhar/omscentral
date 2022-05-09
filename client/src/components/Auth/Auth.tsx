@@ -9,30 +9,32 @@ import { useUpsertUserMutation } from 'src/graphql';
 import { FirebaseContext } from '../Firebase';
 import { toInput } from './Auth.utils';
 
-interface State {
+interface ContextValue {
   initializing: boolean;
   authenticated: boolean;
   user: Nullable<User>;
 }
 
-const initialState: State = {
+const initialValue: ContextValue = {
   initializing: true,
   authenticated: false,
   user: null,
 };
 
-export const AuthContext = createContext<State>(initialState);
+export const AuthContext = createContext<ContextValue>(initialValue);
+
+export const useAuth: () => ContextValue = () => useContext(AuthContext);
 
 const Auth: React.FC = ({ children }) => {
   const firebase = useContext(FirebaseContext);
-  const [state, setState] = useState<State>(initialState);
+  const [value, setValue] = useState<ContextValue>(initialValue);
   const [upsertUser] = useUpsertUserMutation();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(firebase.auth, async (authUser) => {
       apollo.resetStore();
 
-      setState({
+      setValue({
         initializing: false,
         authenticated: Boolean(authUser),
         user: authUser,
@@ -71,9 +73,7 @@ const Auth: React.FC = ({ children }) => {
     return () => unsubscribe();
   }, [firebase, upsertUser]);
 
-  return (
-    <AuthContext.Provider value={{ ...state }}>{children}</AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export default Auth;

@@ -66,6 +66,18 @@ type Course {
   metric: CourseMetric
 }
 
+type Price {
+  amount: Float!
+  currency: String # default USD
+}
+
+type PricingTier {
+  id: String!
+  name: String!
+  features: [String!]!
+  price: Price!
+}
+
 """
 OMS program (CS, Cyber, Analytics).
 """
@@ -180,6 +192,10 @@ type User {
   role: String!
   "Profile image of the user (if we have it)."
   photo_url: String
+  "This is set (from the payment processor) when the user initiates checkout."
+  customer_id: String
+  "What subscription plan has the user signed up for?"
+  pricing_tier: String
   "Whether user prefers to remain anonymous."
   anonymous: Boolean!
   "Program in which user is enrolled."
@@ -204,6 +220,21 @@ type CourseSeriesItem {
   avg_workload: Float!
 }
 
+type Feature {
+  id: String!
+  alias: String!
+  name: String!
+  description: String!
+  pricing_tier: String
+  release_date: Float!
+  status: String!
+}
+
+type WordCount {
+  text: String!
+  value: Float!
+}
+
 """
 API queries.
 """
@@ -211,15 +242,22 @@ type Query {
   "Fetches a config record by ID."
   config(id: String!): Config
 
+  "Fetches all features (past, present, and future)."
+  features: [Feature!]!
+
   "Fetches a course."
   course(
     id: String!
     semester_ids: [String!]! = []
     difficulties: [Int!]! = []
+    ratings: [Int!]! = []
   ): Course!
 
   "Fetches a course's aggregate stats grouped and ordered by semesters."
   courseSeries(id: String!): [CourseSeriesItem!]!
+
+  "Fetches all pricing tiers (i.e. subscription plans)."
+  pricingTiers: [PricingTier!]!
 
   "Fetches all courses."
   courses: [Course!]!
@@ -248,8 +286,12 @@ type Query {
     course_ids: [String!]! = []
     semester_ids: [String!]! = []
     difficulties: [Int!]! = []
+    ratings: [Int!]! = []
     query: String = ""
   ): [Review!]!
+
+  "Fetches model for rendering a course's reviews' word cloud."
+  words(course_id: String!): [WordCount!]!
 }
 
 input ReviewInputType {
@@ -262,15 +304,34 @@ input ReviewInputType {
   body: String!
 }
 
+"""
+Fields client may mutate, (except for ID, which needed for lookup).
+"""
 input UserInputType {
   id: String!
+
+  # from firebase
   auth_provider: String!
   email: String
   name: String
   photo_url: String
+  last_signed_in: Float!
+
+  # from users
   program_id: String
   specialization_id: String
-  last_signed_in: Float!
+}
+
+input CheckoutSessionInputType {
+  plan: String! # basic, standard, premium
+}
+
+input CustomerPortalSessionInputType {
+  returnUrl: String!
+}
+
+type Session {
+  url: String
 }
 
 """
@@ -294,4 +355,10 @@ type Mutation {
 
   "Flags a review for review by admins."
   reportReview(id: String!): Boolean!
+
+  "https://stripe.com/docs/payments/accept-a-payment?platform=web&ui=checkout#redirect-customers"
+  createCheckoutSession(input: CheckoutSessionInputType!): Session!
+
+  "https://stripe.com/docs/api/customer_portal/sessions/create"
+  createCustomerPortalSession(input: CustomerPortalSessionInputType!): Session!
 }

@@ -1,5 +1,5 @@
 import { logEvent } from '@firebase/analytics';
-import MaterialLink from '@material-ui/core/Link';
+import MUILink from '@material-ui/core/Link';
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router';
 import { Link as RouterLink, LinkProps } from 'react-router-dom';
@@ -7,7 +7,7 @@ import { Link as RouterLink, LinkProps } from 'react-router-dom';
 import { FirebaseContext } from '../Firebase';
 
 const Link: React.FC<
-  LinkProps & { to: string | null; onClick?: () => void }
+  LinkProps & { to: string | null; replace?: boolean; onClick?: () => void }
 > = (props) => {
   const history = useHistory();
   const firebase = useContext(FirebaseContext);
@@ -26,15 +26,17 @@ const Link: React.FC<
         firebase_screen: to,
         firebase_screen_class: 'Link',
       });
-      window.open(to); // eslint-disable-line
+      if (props.replace) {
+        location.href = to;
+      } else {
+        window.open(to);
+      }
     } else {
       history.push(to);
     }
   };
 
-  return (
-    <RouterLink component={MaterialLink} {...props} onClick={handleClick} />
-  );
+  return <RouterLink component={MUILink} {...props} onClick={handleClick} />;
 };
 
 export default Link;

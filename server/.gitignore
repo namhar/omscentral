@@ -32,11 +32,6 @@ coverage/
 .nyc_output/
 .eslintcache
 
-# Env Vars
-.env
-.env.staging
-.env.production
-
 # Other
 _*.json
 keys/
@@ -45,3 +40,9 @@ database/migrations/*_fill_reviews.ts
 
 # GraphQL
 src/graphql/
+
+# Env Vars
+.env
+.env*.local
+.env*.staging
+.env*.production

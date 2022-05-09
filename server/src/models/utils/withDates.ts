@@ -1,10 +1,13 @@
 import { Model, ModelOptions, Pojo, QueryContext } from 'objection';
 
+import { Maybe } from '../../graphql';
+import { UnixTime } from '../../types';
+
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const withDates = (ModelToDecorate: typeof Model) =>
   class ModelWithDates extends ModelToDecorate {
-    created!: number;
-    updated!: number | null;
+    created!: UnixTime;
+    updated!: Maybe<UnixTime>;
 
     static jsonSchema = {};
 

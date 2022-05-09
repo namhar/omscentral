@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express';
 
 import { firebase } from '../components';
+import { getUser } from '../functions';
 import { Request } from '../types';
 
 export const middleware = (): RequestHandler => async (req, res, next) => {
@@ -11,6 +12,7 @@ export const middleware = (): RequestHandler => async (req, res, next) => {
     if (idToken) {
       const { uid } = await firebase.auth().verifyIdToken(idToken);
       (req as Request).userId = uid;
+      (req as Request).user = uid != null ? await getUser(uid) : null;
     }
   } catch {}
 

@@ -67,6 +67,7 @@ module.exports = {
     'react/no-unused-prop-types': 'error',
     'react/prop-types': 'off',
     'react/react-in-jsx-scope': 'error',
+    'security/detect-non-literal-fs-filename': 'off',
     'security/detect-object-injection': 'off',
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',

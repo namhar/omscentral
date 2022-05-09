@@ -5,25 +5,22 @@ import { Helmet } from 'react-helmet';
 import Apollo from '../Apollo';
 import App from '../App';
 import Auth from '../Auth';
+import Features from '../Features';
 import Firebase from '../Firebase';
-import Notification from '../Notification';
 import Sentry from '../Sentry';
 import Theme from '../Theme';
 
 const Root: React.FC = () => (
   <CssBaseline>
     <Theme>
+      <Helmet titleTemplate="%s | OMSCentral" defaultTitle="OMSCentral" />
       <Apollo>
         <Firebase>
           <Auth>
-            <Notification>
-              <Helmet
-                titleTemplate="%s | OMSCentral"
-                defaultTitle="OMSCentral"
-              />
+            <Features>
               <Sentry />
               <App />
-            </Notification>
+            </Features>
           </Auth>
         </Firebase>
       </Apollo>

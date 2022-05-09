@@ -16,6 +16,7 @@ export const middleware = (): RequestHandler =>
     const { headers } = req;
 
     if (
+      req.path !== '/graphql' ||
       req.method === 'OPTIONS' ||
       isTrusted(headers) ||
       (await isGooglebot(headers))
